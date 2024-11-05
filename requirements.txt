@@ -7,3 +7,4 @@ googletrans==4.0.0rc1
 gunicorn
 dj-database-url
 psycopg2-binary
+python-dotenv
