@@ -46,11 +46,14 @@
                             <span>Negative:</span>
                             <span id="negativeScore" class="font-semibold"></span>
                         </div>
+                        <div class="text-gray-500 text-3xl font-bold">
+                            <span id="nullScore" class="font-semibold"></span>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Container for the Plotly chart -->
-                <div id="sentimentChart" class="mt-1"></div>
+                <div id="sentimentChart" class="mt-1 sentimentChart"></div>
             </div>
         </div>
     </div>
@@ -62,10 +65,12 @@
             document.getElementById('result').classList.add('hidden');
             document.getElementById('positiveScore').textContent = '';
             document.getElementById('negativeScore').textContent = '';
+            document.getElementById('nullScore').textContent = '';
 
             // Asegurarse de que los textos de "Positive" y "Negative" estén visibles
             document.querySelector('.text-green-500').classList.remove('hidden');
             document.querySelector('.text-red-500').classList.remove('hidden');            
+            document.querySelector('.sentimentChart').classList.remove('hidden');            
 
             // Limpiar cualquier gráfica previa de Plotly
             const chartDiv = document.getElementById('sentimentChart');
@@ -80,21 +85,19 @@
                 });
                 
                 const data = await response.json();
-                
-                document.getElementById('result').classList.remove('hidden');
 
+                document.getElementById('result').classList.remove('hidden');
                 
                 if (data.positive > 0.1) { document.getElementById('positiveScore').textContent = `😁 ${(data.positive * 100).toFixed(0)}%`; }
                 else { document.querySelector('.text-green-500').classList.add('hidden'); } 
                 if (data.negative > 0.1) { document.getElementById('negativeScore').textContent = `😫 ${(data.negative * 100).toFixed(0)}%`; } 
                 else { document.querySelector('.text-red-500').classList.add('hidden'); }
+                if (data.sentiment) { document.getElementById('nullScore').textContent = `Lo siento, el texto no tiene frases para este análisis! 😁`;}
+                if (data.sentiment) {document.getElementById('.sentimentChart').classList.add('hidden')}
+                // else {document.getElementById('.sentimentChart').classList.add('hidden')}
+                // { document.querySelector('.text-red-500').classList.add('hidden'); }
 
-                // document.getElementById('positiveScore').textContent = 
-                //     `😁 ${(data.positive * 100).toFixed(0)}%`;
-                // document.getElementById('negativeScore').textContent = 
-                //     `😫 ${(data.negative * 100).toFixed(0)}%`;
-                
-                // Plotly stacked bar chart data for a single bar with horizontal orientation
+                // Plotly stacked bar chart setup
                 const chartData = [{
                 x: [data.positive * 100],
                 y: ['Sentiment'],
@@ -138,60 +141,7 @@
             }
         });
     </script>
-    
-    
-    
-    <!-- <script>
-        document.getElementById('sentimentForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            
-            try {
-                const response = await fetch('', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                document.getElementById('result').classList.remove('hidden');
-                document.getElementById('positiveScore').textContent = 
-                    `${(data.positive * 100).toFixed(2)}%`;
-                document.getElementById('negativeScore').textContent = 
-                    `${(data.negative * 100).toFixed(2)}%`;
-                
-                // Plotly stacked bar chart data for a single bar
-                const chartData = [{
-                    x: ['Sentiment'],
-                    y: [data.positive * 100],
-                    name: 'Positive',
-                    type: 'bar',
-                    marker: { color: '#4CAF50' } // Green for positive
-                }, {
-                    x: ['Sentiment'],
-                    y: [data.negative * 100],
-                    name: 'Negative',
-                    type: 'bar',
-                    marker: { color: '#F44336' } // Red for negative
-                }];
-                
-                // Layout options to stack bars and set y-axis limit
-                const layout = {
-                    title: 'Sentiment Analysis',
-                    barmode: 'stack',
-                    xaxis: { title: '' },
-                    yaxis: { title: 'Percentage (%)', range: [0, 100] }
-                };
-                
-                // Render the Plotly chart
-                Plotly.newPlot('sentimentChart', chartData, layout);
-                
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-    </script> -->
+
 </body>
 </html>
 <!-- <svg fill="#e46f2f" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 52 52" enable-background="new 0 0 52 52" xml:space="preserve" stroke="#e46f2f"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M26,2C12.8,2,2,12.8,2,26.1c0,13.3,10.8,24.1,24,24.1s24-10.8,24-24.1C50,12.8,39.2,2,26,2z M17,15 c1.7,0,3,1.8,3,4c0,2.2-1.3,4-3,4c-1.7,0-3-1.8-3-4C14,16.8,15.3,15,17,15z M14,38.7c0.5-6.1,5-11.2,12.1-11.2 c7,0,11.4,5.1,11.9,11.2H14z M35,23c-1.7,0-3-1.8-3-4c0-2.2,1.3-4,3-4c1.7,0,3,1.8,3,4C38,21.2,36.7,23,35,23z"></path> </g></svg> -->

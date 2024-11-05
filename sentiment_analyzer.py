@@ -85,8 +85,38 @@ class SentimentAnalyzer:
         print(f"Model accuracy: {accuracy}")
         
         return accuracy
-    
+
     def predict(self, text):
+        # Preprocesar el texto
+        processed = self.preprocess_text(text)
+        
+        # Filtrar palabras que están en el vocabulario
+        words = processed.split()
+        valid_words = [word for word in words if word in self.vectorizer.vocabulary_]
+        
+        # Si no quedan palabras válidas, retornar un mensaje
+        if not valid_words:
+            return {
+                'error': 'No valid words for prediction',
+                'sentiment': 'unknown',
+                'negative': None,
+                'positive': None
+            }
+        
+        # Vectorizar solo las palabras válidas
+        vec_text = self.vectorizer.transform([' '.join(valid_words)])
+        
+        # Realizar la predicción
+        prediction = self.model.predict_proba(vec_text)[0]
+        
+        return {
+            'negative': float(prediction[0]),
+            'positive': float(prediction[1])
+        }
+
+
+
+    def predict_00(self, text):
         # Preprocesar texto
         processed = self.preprocess_text(text)
         # Vectorizar
@@ -103,14 +133,24 @@ class SentimentAnalyzer:
             pickle.dump({'vectorizer': self.vectorizer, 'model': self.model}, f)
     
     @classmethod
-    def load_model(cls, model_path):
+    def load_model_00(cls, model_path):
         analyzer = cls()
         with open(model_path, 'rb') as f:
             components = pickle.load(f)
             analyzer.vectorizer = components['vectorizer']
             analyzer.model = components['model']
         return analyzer
-
+    
+    @classmethod
+    def load_model(cls, model_path):
+        analyzer = cls()
+        with open(model_path, 'rb') as f:
+            components = pickle.load(f)
+            analyzer.vectorizer = components['vectorizer']
+            analyzer.model = components['model']
+            analyzer.vocab = components.get('vocabulary')  # Cargar vocabulario
+            analyzer.vectorizer.vocabulary_ = analyzer.vocab
+        return analyzer
 
 # Ejemplo de uso para entrenamiento
 if __name__ == "__main__":
