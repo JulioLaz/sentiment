@@ -19,8 +19,8 @@ def analyze_sentiment(request):
         print("Texto traducido:", translated_text)
 
         ### ACTIVAR GEMINI ###
-        analyzer_gemini= '50% positive, 50% negative'
-        # analyzer_gemini= gemini.chat(text) 
+        # analyzer_gemini= '50% positive, 50% negative'
+        analyzer_gemini= gemini.chat(text) 
         print("analyzer_gemini:", analyzer_gemini)
 
         if "Lo siento" not in analyzer_gemini:
