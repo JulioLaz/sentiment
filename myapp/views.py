@@ -11,44 +11,42 @@ vocab = analyzer.vectorizer.vocabulary_  # Obtiene el vocabulario del modelo car
 def analyze_sentiment(request):
     if request.method == 'POST':
         text = request.POST.get('text', '')
-        print("Texto original:", text)
+        # print("Texto original:", text)
         
         # Traducción del texto al inglés
         translator = Translator()
         translated_text = translator.translate(text, dest='es').text
-        print("Texto traducido:", translated_text)
+        # print("Texto traducido:", translated_text)
 
         ### ACTIVAR GEMINI ###
-        # analyzer_gemini= '50% positive, 50% negative'
-        analyzer_gemini= gemini.chat(text) 
-        print("analyzer_gemini:", analyzer_gemini)
+        analyzer_gemini= '50% positive, 50% negative'
+        # analyzer_gemini= gemini.chat(text) 
+        # print("analyzer_gemini:", analyzer_gemini)
 
-        if "Lo siento" not in analyzer_gemini:
-          print("Gemini result: ", analyzer_gemini)
         # Filtrar palabras según el vocabulario del modelo
         filtered_text = " ".join(word for word in text.split() if word in vocab)
-        print("Texto filtrado según vocabulario:", filtered_text)
+        # print("Texto filtrado según vocabulario:", filtered_text)
         
         none_gemini= True
 
         
         if "Lo siento" not in analyzer_gemini:
-          print("Gemini result: ", analyzer_gemini)
+        #   print("Gemini result: ", analyzer_gemini)
           parts = analyzer_gemini.split(',')
           positive_gemini = int(parts[0].split('%')[0].strip())
           negative_gemini= int(parts[1].split('%')[0].strip())
-          print("Gemini result positive_gemini: ", positive_gemini)
-          print("Gemini result negative_gemini: ", negative_gemini)
+        #   print("Gemini result positive_gemini: ", positive_gemini)
+        #   print("Gemini result negative_gemini: ", negative_gemini)
         else: 
             none_gemini= 'None'
             # negative_gemini =0
-        print('filtered_text: ',filtered_text)
-        print('filtered_text TYPE: ',type(filtered_text))
-        print('filtered_text LEN: ',len(filtered_text), 'type of len: ',type(len(filtered_text)) )
+        # print('filtered_text: ',filtered_text)
+        # print('filtered_text TYPE: ',type(filtered_text))
+        # print('filtered_text LEN: ',len(filtered_text), 'type of len: ',type(len(filtered_text)) )
         # Realizar la predicción si hay texto filtrado
         if filtered_text:
             result = analyzer.predict(filtered_text)
-            print('result: ',result)
+            # print('result: ',result)
             # print('result: ',result['sentiment'])
             response_data = {
                 'filtered_text': filtered_text,
@@ -66,7 +64,7 @@ def analyze_sentiment(request):
             # print("Gemini result negative_gemini: ", negative_gemini)
             # print("analyzer_gemini: ", analyzer_gemini)
             result='none'
-            print('result: ',result)
+            # print('result: ',result)
             return JsonResponse({
                'positive_gemini': positive_gemini,  # Resultado de Gemini
                 'negative_gemini': negative_gemini,
