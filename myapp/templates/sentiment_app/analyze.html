@@ -52,15 +52,15 @@
                     </div>
                 </div>
                 <!-- Container for the Plotly chart -->
-                <div id="sentimentChart" class="mt-1 sentimentChart "></div>                
+                <div id="sentimentChart" class="mt-1 sentimentChart"></div>                
                 <hr>
                 <h2 class="text-gray-500 text-2xl font-semibold mt-4 text-center mx-auto">Gemini-IA analysis result:</h2>
-                <div class="flex items-center justify-center gemini">
+                <div class="flex items-center justify-center">
+                <!-- <div class="flex items-center justify-center gemini"> -->
                     <div class="text-green-400 text-3xl font-bold mt-4 text-center mx-auto">
                         <span>Positive: </span>
                         <span id="positive_gemini" class=""></span>
                     </div>
-                    <span> - </span>
                     <div class="text-red-400 text-3xl font-bold mt-4 text-center mx-auto">
                         <span>Negative:</span>
                         <span id="negative_gemini" class=""></span>
@@ -99,6 +99,8 @@
             // Asegurarse de que los textos de "Positive" y "Negative" estén visibles
             document.querySelector('.text-green-500').classList.remove('hidden');
             document.querySelector('.text-red-500').classList.remove('hidden');            
+            document.querySelector('.text-green-400').classList.remove('hidden');
+            document.querySelector('.text-red-400').classList.remove('hidden');            
             document.querySelector('.sentimentChart').classList.remove('hidden');            
             document.querySelector('.sentimentChart_gemini').classList.remove('hidden');            
             // document.querySelector('.nullScore').classList.remove('hidden');            
@@ -128,29 +130,22 @@
                 if ((data.filtered_text!='')&(data.result.negative > 0.01)) { document.getElementById('negativeScore').textContent = `😫 ${(data.result.negative * 100).toFixed(0)}%`; } 
                 else { document.querySelector('.text-red-500').classList.add('hidden'); }
                 
-                // if (data.result.positive > 0.01) { document.getElementById('positiveScore').textContent = `😁 ${(data.result.positive * 100).toFixed(0)}%`; }
-                // else { document.querySelector('.text-green-500').classList.add('hidden'); } 
-                // if (data.result.negative > 0.01) { document.getElementById('negativeScore').textContent = `😫 ${(data.result.negative * 100).toFixed(0)}%`; } 
-                // else { document.querySelector('.text-red-500').classList.add('hidden'); }
-
                 // if (data.result.sentiment) { document.getElementById('nullScore').textContent = `Lo siento, tengo limitaciones para interpretar esta reseña, mi modelo es limitado!`;}
                 // if (data.result.sentiment) {document.getElementById('.sentimentChart').classList.add('hidden')}
 
                 // if ('none' in data.result) { document.getElementById('nullScore').textContent = `Lo siento, tengo limitaciones para interpretar esta reseña, mi modelo es limitado!`}
                 if ('none' in data.result) {document.getElementById('.sentimentChart').classList.add('hidden')}
 
-                if ((data.none_gemini!='None') & (data.positive_gemini>0)) {document.getElementById('positive_gemini').textContent = `😁 ${data.positive_gemini}%`}
-                else { document.querySelector('.gemini').classList.add('hidden');  document.querySelector('.display_none').style.display = 'none'} 
-                if (data.none_gemini!='None') {document.getElementById('negative_gemini').textContent = `😫 ${data.negative_gemini}%`;}
-                else { document.querySelector('.gemini').classList.add('hidden'); document.querySelector('.display_none').style.display = 'none'} 
-
-                // if ((data.positive_gemini!=0) & (data.negative_gemini!=0)) {document.getElementById('positive_gemini').textContent = `😁 ${data.positive_gemini}%`}
+                // if ((data.none_gemini!='None') & (data.positive_gemini>0)) {document.getElementById('positive_gemini').textContent = `😁 ${data.positive_gemini}%`}
                 // else { document.querySelector('.gemini').classList.add('hidden');  document.querySelector('.display_none').style.display = 'none'} 
-                // if ((data.positive_gemini!=0) & (data.negative_gemini!=0)) {document.getElementById('negative_gemini').textContent = `😫 ${data.negative_gemini}%`;}
+                // if (data.none_gemini!='None') {document.getElementById('negative_gemini').textContent = `😫 ${data.negative_gemini}%`;}
                 // else { document.querySelector('.gemini').classList.add('hidden'); document.querySelector('.display_none').style.display = 'none'} 
 
-                // if (data.positive_gemini==100){document.getElementById('positive_gemini').textContent = `😁 ${data.positive_gemini}%`;}
-                // if (data.negative_gemini==100){document.getElementById('negative_gemini').textContent = `😫 ${data.negative_gemini}%`;}
+                if ((data.positive_gemini!=0) | (data.negative_gemini!=0)) {document.getElementById('positive_gemini').textContent = `😁 ${data.positive_gemini}%`}
+                else { document.querySelector('.gemini').classList.add('hidden');  document.querySelector('.display_none').style.display = 'none'} 
+                if ((data.positive_gemini!=0) | (data.negative_gemini!=0)) {document.getElementById('negative_gemini').textContent = `😫 ${data.negative_gemini}%`;}
+                else { document.querySelector('.gemini').classList.add('hidden'); document.querySelector('.display_none').style.display = 'none'} 
+
                 if ((data.positive_gemini==0) & (data.negative_gemini==0)) {document.getElementById('gemini_result').textContent = `${data.gemini_result}`;}
                 else { document.querySelector('.gemini_result').classList.add('hidden'); } 
 

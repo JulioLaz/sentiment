@@ -19,8 +19,8 @@ def analyze_sentiment(request):
         print("Texto traducido:", translated_text)
 
         ### ACTIVAR GEMINI ###
-        # analyzer_gemini= '50% positive, 50% negative'
-        analyzer_gemini= gemini.chat(text) 
+        analyzer_gemini= '50% positive, 50% negative'
+        # analyzer_gemini= gemini.chat(text) 
         print("analyzer_gemini:", analyzer_gemini)
 
         if "Lo siento" not in analyzer_gemini:
@@ -62,9 +62,9 @@ def analyze_sentiment(request):
             }
             return JsonResponse(response_data)
         else:
-            print("Gemini result positive_gemini: ", positive_gemini)
-            print("Gemini result negative_gemini: ", negative_gemini)
-            print("analyzer_gemini: ", analyzer_gemini)
+            # print("Gemini result positive_gemini: ", positive_gemini)
+            # print("Gemini result negative_gemini: ", negative_gemini)
+            # print("analyzer_gemini: ", analyzer_gemini)
             result='none'
             print('result: ',result)
             return JsonResponse({
@@ -78,7 +78,7 @@ def analyze_sentiment(request):
                 'negative': None,
                 'positive': None,
                 'gemini_result': analyzer_gemini,
-                'none_gemini':none_gemini
+                # 'none_gemini':none_gemini
             })
         # Realizar la predicción si hay texto filtrado
         # if filtered_text:
