@@ -1,52 +1,155 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from sentiment_analyzer import SentimentAnalyzer  # Asegúrate de tener este archivo aquí
-from googletrans import Translator  # Asegúrate de tener esta biblioteca instalada
+from django.views.decorators.csrf import csrf_exempt
+from sentiment_analyzer import SentimentAnalyzer
+# from googletrans import Translator
+from deep_translator import GoogleTranslator
+import langid
 import gemini
+
+# analyzer = SentimentAnalyzer.load_model('myapp/optimized_sentiment_model_2_10000.pkl')
+# vocab = analyzer.vectorizer.vocabulary_
+
+# @csrf_exempt
+# def analyze_sentiment(request):
+    
+#     if request.method == 'POST':
+#         try:
+#             text = request.POST.get('text', '').strip()
+#             print('texto extraido: ', text)
+#             # filtered_text = " ".join(word for word in text.split() if word in vocab)
+#             # print("Texto filtrado según vocabulario:", filtered_text)
+#             if not text:
+#                 return JsonResponse({
+#                     'error': 'No text provided',
+#                     'result': {'positive': 0, 'negative': 0},
+#                     'positive_gemini': 0,
+#                     'negative_gemini': 0,
+#                     'translated_text': '',
+#                     'gemini_result': 'No se proporcionó texto para analizar'
+#                 })
+            
+#             # Translation
+#             try:
+#                 translated_text = GoogleTranslator(source='auto', target='es').translate(text)
+#                 print(f"Translation translated_text: {translated_text}")
+#             except Exception as e:
+#                 translated_text = text
+#                 print(f"Translation error: {str(e)}")
+
+#             # Gemini Analysis
+#             try:
+#                 # analyzer_gemini = gemini.chat(text)
+#                 analyzer_gemini= '50% positive, 50% negative'
+#                 # analyzer_gemini= 'Lo siento,ha ocurrido un error en el análisis de Gemini.'
+#                 positive_gemini = 0
+#                 negative_gemini = 0
+                
+#                 if "Lo siento" not in analyzer_gemini:
+#                     parts = analyzer_gemini.split(',')
+#                     positive_gemini = int(parts[0].split('%')[0].strip())
+#                     negative_gemini = int(parts[1].split('%')[0].strip())
+#             except Exception as e:
+#                 analyzer_gemini = "Lo siento, ha ocurrido un error en el análisis de Gemini."
+#                 print(f"Gemini error: {str(e)}")
+
+#             # Filter text and analyze sentiment
+#             filtered_text = " ".join(word for word in text.split() if word in vocab)
+            
+#             if filtered_text:
+#                 result = analyzer.predict(filtered_text)
+#             else:
+#                 result = {'positive': 0, 'negative': 0}
+
+#             response_data = {
+#                 'filtered_text': filtered_text,
+#                 'result': result,
+#                 'positive_gemini': positive_gemini,
+#                 'negative_gemini': negative_gemini,
+#                 'translated_text': translated_text,
+#                 'gemini_result': analyzer_gemini
+#             }
+
+#             return JsonResponse(response_data)
+
+#         except Exception as e:
+#             print(f"Server error: {str(e)}")
+#             return JsonResponse({
+#                 'error': str(e),
+#                 'result': {'positive': 0, 'negative': 0},
+#                 'positive_gemini': 0,
+#                 'negative_gemini': 0,
+#                 'translated_text': translated_text,
+#                 'gemini_result': analyzer_gemini
+#             })
+
+#     return render(request, 'sentiment_app/analyze.html')
+
+###########################################################################################
+
+# from django.http import JsonResponse
+# from django.shortcuts import render
+# from sentiment_analyzer import SentimentAnalyzer  # Asegúrate de tener este archivo aquí
+# from googletrans import Translator  # Asegúrate de tener esta biblioteca instalada
+# import gemini
 
 analyzer = SentimentAnalyzer.load_model('myapp/optimized_sentiment_model_2_10000.pkl')
 vocab = analyzer.vectorizer.vocabulary_  # Obtiene el vocabulario del modelo cargado
 
 # Función para analizar el sentimiento
+@csrf_exempt
 def analyze_sentiment(request):
     if request.method == 'POST':
         text = request.POST.get('text', '')
+        
+        # def idioma(palabra): 
+        #     idioma, _ = langid.classify(palabra) 
+        #     return idioma == 'en'
         # print("Texto original:", text)
         
         # Traducción del texto al inglés
-        translator = Translator()
-        translated_text = translator.translate(text, dest='es').text
-        # print("Texto traducido:", translated_text)
+        try:
+            translated_text = GoogleTranslator(source='auto', target='es').translate(text)
+            print(f"Translation translated_text: {translated_text}")
+        except Exception as e:
+            translated_text='Lo siento, tengo problemas para traducir este texto!'
 
-        ### ACTIVAR GEMINI ###
-        # analyzer_gemini= '50% positive, 50% negative'
-        analyzer_gemini= gemini.chat(text) 
-        # print("analyzer_gemini:", analyzer_gemini)
 
         # Filtrar palabras según el vocabulario del modelo
         filtered_text = " ".join(word for word in text.split() if word in vocab)
         # print("Texto filtrado según vocabulario:", filtered_text)
         
-        none_gemini= True
 
-        
-        if "Lo siento" not in analyzer_gemini:
-        #   print("Gemini result: ", analyzer_gemini)
-          parts = analyzer_gemini.split(',')
-          positive_gemini = int(parts[0].split('%')[0].strip())
-          negative_gemini= int(parts[1].split('%')[0].strip())
-        #   print("Gemini result positive_gemini: ", positive_gemini)
-        #   print("Gemini result negative_gemini: ", negative_gemini)
-        else: 
-            none_gemini= 'None'
-            # negative_gemini =0
-        # print('filtered_text: ',filtered_text)
-        # print('filtered_text TYPE: ',type(filtered_text))
-        # print('filtered_text LEN: ',len(filtered_text), 'type of len: ',type(len(filtered_text)) )
-        # Realizar la predicción si hay texto filtrado
+        def analizer_gemini():
+            ### ACTIVAR GEMINI ###
+            # analyzer_gemini= '50% positive, 50% negative'
+            analyzer_gemini= gemini.chat(text) 
+            # print("analyzer_gemini:", analyzer_gemini)
+            
+            if "Lo siento" not in analyzer_gemini:
+                #   print("Gemini result: ", analyzer_gemini)
+                parts = analyzer_gemini.split(',')
+                positive_gemini = int(parts[0].split('%')[0].strip())
+                negative_gemini= int(parts[1].split('%')[0].strip())
+                none_gemini= True
+                #   print("Gemini result positive_gemini: ", positive_gemini)
+                #   print("Gemini result negative_gemini: ", negative_gemini)
+
+                return positive_gemini,negative_gemini,none_gemini,analyzer_gemini
+            else: 
+                none_gemini= 'None'
+                positive_gemini= None
+                negative_gemini= None
+                return positive_gemini,negative_gemini,none_gemini,analyzer_gemini
+                # negative_gemini =0
+            # print('filtered_text: ',filtered_text)
+            # print('filtered_text TYPE: ',type(filtered_text))
+            # print('filtered_text LEN: ',len(filtered_text), 'type of len: ',type(len(filtered_text)) )
+            # Realizar la predicción si hay texto filtrado
         if filtered_text:
+            positive_gemini,negative_gemini,none_gemini,analyzer_gemini=analizer_gemini()
             result = analyzer.predict(filtered_text)
-            # print('result: ',result)
+            print('result: ',result)
             # print('result: ',result['sentiment'])
             response_data = {
                 'filtered_text': filtered_text,
@@ -63,12 +166,14 @@ def analyze_sentiment(request):
             # print("Gemini result positive_gemini: ", positive_gemini)
             # print("Gemini result negative_gemini: ", negative_gemini)
             # print("analyzer_gemini: ", analyzer_gemini)
+            positive_gemini,negative_gemini,none_gemini,analyzer_gemini=analizer_gemini()
+
             result='none'
-            # print('result: ',result)
+            print('result SIN TEXTO: ',result)
             return JsonResponse({
-               'positive_gemini': positive_gemini,  # Resultado de Gemini
+                'positive_gemini': positive_gemini,  # Resultado de Gemini
                 'negative_gemini': negative_gemini,
-               'result':result ,
+                'result':'none' ,
                 'translated_text': translated_text,  # Resultado de Gemini
                 'filtered_text': filtered_text,
                 'error': 'No valid words for prediction',
@@ -78,18 +183,6 @@ def analyze_sentiment(request):
                 'gemini_result': analyzer_gemini,
                 # 'none_gemini':none_gemini
             })
-        # Realizar la predicción si hay texto filtrado
-        # if filtered_text:
-        #     result = analyzer.predict(filtered_text)
-        #     return JsonResponse(result),analyzer_gemini
-        # else:
-        #     return JsonResponse({
-        #         'error': 'No valid words for prediction',
-        #         'sentiment': 'unknown',
-        #         'negative': None,
-        #         'positive': None
-        #     })
-
     return render(request, 'sentiment_app/analyze.html')
 
 

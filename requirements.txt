@@ -3,10 +3,12 @@ numpy
 pandas
 scikit-learn
 nltk
-googletrans==4.0.0rc1
 gunicorn
 dj-database-url
 psycopg2-binary
 python-dotenv
 google-generativeai
 python-dotenv
+deep-translator
+langid
+# googletrans==4.0.0rc1
