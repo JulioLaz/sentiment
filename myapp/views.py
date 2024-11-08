@@ -5,7 +5,7 @@ from sentiment_analyzer import SentimentAnalyzer
 # from googletrans import Translator
 from deep_translator import GoogleTranslator
 # import langid
-# import gemini
+import gemini
 
 # analyzer = SentimentAnalyzer.load_model('myapp/optimized_sentiment_model_2_10000.pkl')
 # vocab = analyzer.vectorizer.vocabulary_
@@ -115,9 +115,10 @@ def analyze_sentiment(request):
             translated_text='Lo siento, tengo problemas para traducir este texto'
 
         ### ACTIVAR GEMINI ###
-        analyzer_gemini= '50% positive, 50% negative'
+        # analyzer_gemini= '50% positive, 50% negative'
         # analyzer_gemini= 'Lo siento error'
-        # analyzer_gemini= gemini.chat(text) 
+        analyzer_gemini= gemini.chat(text)
+        print('analyzer_gemini :',analyzer_gemini)
         # print("analyzer_gemini:", analyzer_gemini)
 
         # Filtrar palabras según el vocabulario del modelo
@@ -127,7 +128,7 @@ def analyze_sentiment(request):
         none_gemini= True
 
         
-        if "Lo siento" not in analyzer_gemini:
+        if ("positive" in analyzer_gemini) | ("negative" in analyzer_gemini):
         #   print("Gemini result: ", analyzer_gemini)
           parts = analyzer_gemini.split(',')
           positive_gemini = int(parts[0].split('%')[0].strip())
@@ -172,8 +173,8 @@ def analyze_sentiment(request):
                 'filtered_text': filtered_text,
                 'error': 'No valid words for prediction',
                 'sentiment': 'unknown',
-                'positive': positive_gemini,
-                'negative': negative_gemini,
+                'positive': 0,
+                'negative': 0,
                 'gemini_result': analyzer_gemini,
                 # 'none_gemini':none_gemini
             })
