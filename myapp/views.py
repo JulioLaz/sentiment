@@ -4,8 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from sentiment_analyzer import SentimentAnalyzer
 # from googletrans import Translator
 from deep_translator import GoogleTranslator
-import langid
-import gemini
+# import langid
+# import gemini
 
 # analyzer = SentimentAnalyzer.load_model('myapp/optimized_sentiment_model_2_10000.pkl')
 # vocab = analyzer.vectorizer.vocabulary_
@@ -172,8 +172,8 @@ def analyze_sentiment(request):
                 'filtered_text': filtered_text,
                 'error': 'No valid words for prediction',
                 'sentiment': 'unknown',
-                'negative': None,
-                'positive': None,
+                'positive': positive_gemini,
+                'negative': negative_gemini,
                 'gemini_result': analyzer_gemini,
                 # 'none_gemini':none_gemini
             })
