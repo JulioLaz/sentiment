@@ -112,42 +112,38 @@ def analyze_sentiment(request):
             translated_text = GoogleTranslator(source='auto', target='es').translate(text)
             print(f"Translation translated_text: {translated_text}")
         except Exception as e:
-            translated_text='Lo siento, tengo problemas para traducir este texto!'
+            translated_text='Lo siento, tengo problemas para traducir este texto'
 
+        ### ACTIVAR GEMINI ###
+        analyzer_gemini= '50% positive, 50% negative'
+        # analyzer_gemini= 'Lo siento error'
+        # analyzer_gemini= gemini.chat(text) 
+        # print("analyzer_gemini:", analyzer_gemini)
 
         # Filtrar palabras según el vocabulario del modelo
         filtered_text = " ".join(word for word in text.split() if word in vocab)
         # print("Texto filtrado según vocabulario:", filtered_text)
         
+        none_gemini= True
 
-        def analizer_gemini():
-            ### ACTIVAR GEMINI ###
-            # analyzer_gemini= '50% positive, 50% negative'
-            analyzer_gemini= gemini.chat(text) 
-            # print("analyzer_gemini:", analyzer_gemini)
-            
-            if "Lo siento" not in analyzer_gemini:
-                #   print("Gemini result: ", analyzer_gemini)
-                parts = analyzer_gemini.split(',')
-                positive_gemini = int(parts[0].split('%')[0].strip())
-                negative_gemini= int(parts[1].split('%')[0].strip())
-                none_gemini= True
-                #   print("Gemini result positive_gemini: ", positive_gemini)
-                #   print("Gemini result negative_gemini: ", negative_gemini)
-
-                return positive_gemini,negative_gemini,none_gemini,analyzer_gemini
-            else: 
-                none_gemini= 'None'
-                positive_gemini= None
-                negative_gemini= None
-                return positive_gemini,negative_gemini,none_gemini,analyzer_gemini
-                # negative_gemini =0
-            # print('filtered_text: ',filtered_text)
-            # print('filtered_text TYPE: ',type(filtered_text))
-            # print('filtered_text LEN: ',len(filtered_text), 'type of len: ',type(len(filtered_text)) )
-            # Realizar la predicción si hay texto filtrado
+        
+        if "Lo siento" not in analyzer_gemini:
+        #   print("Gemini result: ", analyzer_gemini)
+          parts = analyzer_gemini.split(',')
+          positive_gemini = int(parts[0].split('%')[0].strip())
+          negative_gemini= int(parts[1].split('%')[0].strip())
+        #   print("Gemini result positive_gemini: ", positive_gemini)
+        #   print("Gemini result negative_gemini: ", negative_gemini)
+        else: 
+            none_gemini= 'None'
+            positive_gemini= 0
+            negative_gemini= 0
+            # negative_gemini =0
+        # print('filtered_text: ',filtered_text)
+        # print('filtered_text TYPE: ',type(filtered_text))
+        # print('filtered_text LEN: ',len(filtered_text), 'type of len: ',type(len(filtered_text)) )
+        # Realizar la predicción si hay texto filtrado
         if filtered_text:
-            positive_gemini,negative_gemini,none_gemini,analyzer_gemini=analizer_gemini()
             result = analyzer.predict(filtered_text)
             print('result: ',result)
             # print('result: ',result['sentiment'])
@@ -166,14 +162,12 @@ def analyze_sentiment(request):
             # print("Gemini result positive_gemini: ", positive_gemini)
             # print("Gemini result negative_gemini: ", negative_gemini)
             # print("analyzer_gemini: ", analyzer_gemini)
-            positive_gemini,negative_gemini,none_gemini,analyzer_gemini=analizer_gemini()
-
             result='none'
             print('result SIN TEXTO: ',result)
             return JsonResponse({
                 'positive_gemini': positive_gemini,  # Resultado de Gemini
                 'negative_gemini': negative_gemini,
-                'result':'none' ,
+                'result':False,
                 'translated_text': translated_text,  # Resultado de Gemini
                 'filtered_text': filtered_text,
                 'error': 'No valid words for prediction',
