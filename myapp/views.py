@@ -29,15 +29,15 @@ def analyze_sentiment(request):
             translated_text='Lo siento, tengo problemas para traducir este texto'
 
         ### ACTIVAR GEMINI ###
-        # analyzer_gemini= '50% positive, 50% negative'
+        analyzer_gemini= '50% positive, 50% negative'
         # analyzer_gemini= 'Lo siento error'
-        analyzer_gemini= gemini.chat(text)
+        # analyzer_gemini= gemini.chat(text)
         print('analyzer_gemini :',analyzer_gemini)
         # print("analyzer_gemini:", analyzer_gemini)
 
         # Filtrar palabras según el vocabulario del modelo
         filtered_text = " ".join(word for word in text.split() if word in vocab)
-        # print("Texto filtrado según vocabulario:", filtered_text)
+        print("Texto filtrado según vocabulario:", filtered_text)
         
         none_gemini= True
 
@@ -77,8 +77,8 @@ def analyze_sentiment(request):
             # print("Gemini result positive_gemini: ", positive_gemini)
             # print("Gemini result negative_gemini: ", negative_gemini)
             # print("analyzer_gemini: ", analyzer_gemini)
-            result='none'
-            print('result SIN TEXTO: ',result)
+            # result='none'
+            print('filtered_text: ',filtered_text)
             return JsonResponse({
                 'positive_gemini': positive_gemini,  # Resultado de Gemini
                 'negative_gemini': negative_gemini,
