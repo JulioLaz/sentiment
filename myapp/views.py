@@ -29,9 +29,9 @@ def analyze_sentiment(request):
             translated_text='Lo siento, tengo problemas para traducir este texto'
 
         ### ACTIVAR GEMINI ###
-        analyzer_gemini= '50% positive, 50% negative'
+        # analyzer_gemini= '50% positive, 50% negative'
         # analyzer_gemini= 'Lo siento error'
-        # analyzer_gemini= gemini.chat(text)
+        analyzer_gemini= gemini.chat(text)
         print('analyzer_gemini :',analyzer_gemini)
         # print("analyzer_gemini:", analyzer_gemini)
 
