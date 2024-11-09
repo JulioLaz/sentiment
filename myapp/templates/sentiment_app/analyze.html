@@ -1,67 +1,88 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Sentiment Analysis</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='%23e46f2f' width='24px' height='24px' viewBox='0 0 52 52' stroke='%23e46f2f'><path d='M26,2C12.8,2,2,12.8,2,26.1c0,13.3,10.8,24.1,24,24.1s24-10.8,24-24.1C50,12.8,39.2,2,26,2z M17,15 c1.7,0,3,1.8,3,4c0,2.2-1.3,4-3,4c-1.7,0-3-1.8-3-4C14,16.8,15.3,15,17,15z M14,38.7c0.5-6.1,5-11.2,12.1-11.2 c7,0,11.4,5.1,11.9,11.2H14z M35,23c-1.7,0-3-1.8-3-4c0-2.2,1.3-4,3-4c1.7,0,3,1.8,3,4C38,21.2,36.7,23,35,23z'/></svg>">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='%23e46f2f' width='24px' height='24px' viewBox='0 0 52 52' stroke='%23e46f2f'><path d='M26,2C12.8,2,2,12.8,2,26.1c0,13.3,10.8,24.1,24,24.1s24-10.8,24-24.1C50,12.8,39.2,2,26,2z M17,15 c1.7,0,3,1.8,3,4c0,2.2-1.3,4-3,4c-1.7,0-3-1.8-3-4C14,16.8,15.3,15,17,15z M14,38.7c0.5-6.1,5-11.2,12.1-11.2 c7,0,11.4,5.1,11.9,11.2H14z M35,23c-1.7,0-3-1.8-3-4c0-2.2,1.3-4,3-4c1.7,0,3,1.8,3,4C38,21.2,36.7,23,35,23z'/></svg>">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Include Plotly -->
 </head>
+
+<style>
+    .loader {
+        border-top-color: #3498db;
+        /* Color del borde superior */
+        animation: spinner 1s ease-in-out infinite;
+    }
+
+    @keyframes spinner {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+
 <body class="bg-gray-900 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-8 text-center text-blue-500">Sentiment Analysis for Food Reviews</h1>
-        
-        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div class="container mx-auto px-4 py-6">
+        <h1 class="text-3xl font-bold mb-2 text-center text-blue-300">Sentiment Analysis for Food Reviews</h1>
+
+        <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md px-6 py-2">
             <form id="sentimentForm" class="space-y-4">
                 {% csrf_token %}
                 <div>
                     <label class="block text-xl font-medium text-gray-700 mb-2">
                         Enter Food Reviews:
                     </label>
-                    <textarea 
-                        id="textInput"
-                        name="text"
-                        rows="3"
+                    <textarea id="textInput" name="text" rows="3"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-xl"
-                        required
-                    ></textarea>
+                        required></textarea>
                 </div>
-                
-                <button 
-                    type="submit"
-                    class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+
+                <button type="submit"
+                    class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Analyze Sentiment
                 </button>
             </form>
-            
+
+            <!-- Spinner -->
+            <div id="spinner" class="hidden mt-4 flex justify-center">
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+            </div>
+
             <div id="result" class="mt-6 hidden">
-                <h2 class="text-gray-500 text-2xl font-semibold mt-4 text-center mx-auto">Analysis Result - model SGDClassifier:</h2>
-                <div class="space-y-2">
-                    <div class="flex items-center justify-center">
-                        <div class="text-green-500 text-3xl font-bold mr-4">
-                            <span>Positive:</span>
-                            <span id="positiveScore" class="font-semibold"></span>
-                        </div>
-                        <div class="text-red-500 text-3xl font-bold">
-                            <span>Negative:</span>
-                            <span id="negativeScore" class="font-semibold"></span>
-                        </div>
-                        <div class="text-green-500 text-2xl font-semibold">
-                            <div id="nullScore" class="font-semibold text-center"></div>
-                        </div>
+                <h2 class="text-gray-600 text-2xl mt-4 text-center mx-auto">Analysis Result - model SGDClassifier:
+                </h2>
+                <div class="flex items-center justify-center">
+                    <div class="text-yellow-500 text-xl font-bold mt-4 text-center mx-auto">
+                        <span>Positive:</span>
+                        <span id="positiveScore" class=""></span>
+                    </div>
+                    <div class="text-blue-400 text-xl font-bold mt-4 text-center mx-auto">
+                        <span>Negative:</span>
+                        <span id="negativeScore" class=""></span>
+                    </div>
+                    <div class="text-green-500 text-xl ">
+                        <div id="nullScore" class="font-semibold text-center"></div>
                     </div>
                 </div>
                 <!-- Container for the Plotly chart -->
-                <div id="sentimentChart" class="mt-1 sentimentChart"></div>                
-                <hr>
-                <h2 class="text-gray-500 text-2xl font-semibold mt-4 text-center mx-auto">Gemini-IA analysis result:</h2>
-                <!-- <div class="flex items-center justify-center"> -->
+                <div id="sentimentChart" class="mt-1 sentimentChart"></div>
+
+                <hr class="border-t-3  border-gray-300 my-2">
+
+                <h2 class="text-gray-600 text-2xl mt-4 text-center mx-auto">Gemini-IA analysis result:</h2>
                 <div class="flex items-center justify-center gemini">
-                    <div class="text-green-400 text-3xl font-bold mt-4 text-center mx-auto">
+                    <div class="text-pink-400 text-xl font-bold mt-4 text-center mx-auto text_green">
                         <span>Positive: </span>
                         <span id="positive_gemini" class=""></span>
                     </div>
-                    <div class="text-red-400 text-3xl font-bold mt-4 text-center mx-auto">
+                    <div class="text-purple-500 text-xl font-bold mt-4 text-center mx-auto text_red">
                         <span>Negative:</span>
                         <span id="negative_gemini" class=""></span>
                     </div>
@@ -71,18 +92,19 @@
                     <span>¡Advertencia! </span>
                     <span id="gemini_result" class=""></span>
                 </div>
-                
-                <!-- Container for the Plotly chart --> 
+
+                <!-- Container for the Plotly chart -->
                 <div id="sentimentChart_gemini" class="mt-1 sentimentChart_gemini gemini display_none"></div>
-                <hr>
-                <div class="text-gray-600 text-xl font-bold mt-4 text-center mx-auto">
-                    <span>Traducción: </span>
-                    <span id="translated_text" class=""></span>
+                <hr class="border-t-4 border-gray-400 my-2">
+                <div class="text-xl mt-4 text-center mx-auto">
+                    <span class="text-gray-600 font-semibold">Traducción: </span>
+                    <span id="translated_text" class="text-gray-500"></span>
                 </div>
 
             </div>
         </div>
     </div>
+
     <script>
         document.getElementById('sentimentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -96,79 +118,86 @@
             document.getElementById('negative_gemini').textContent = '';
             document.getElementById('translated_text').textContent = '';
 
+            // SPINNER
+            document.getElementById('spinner').classList.remove('hidden');
+
             // Asegurarse de que los textos de "Positive" y "Negative" estén visibles
-            document.querySelector('.text-green-500').classList.remove('hidden');
-            document.querySelector('.text-red-500').classList.remove('hidden');            
-            document.querySelector('.text-green-400').classList.remove('hidden');
-            document.querySelector('.text-red-400').classList.remove('hidden');            
-            document.querySelector('.sentimentChart').classList.remove('hidden');            
-            document.querySelector('.sentimentChart_gemini').classList.remove('hidden');            
+            document.querySelector('.text_green').classList.remove('hidden');
+            document.querySelector('.text_red').classList.remove('hidden');
+            // document.querySelector('.text-green-400').classList.remove('hidden');
+            // document.querySelector('.text-red-400').classList.remove('hidden');            
+            document.querySelector('.sentimentChart').classList.remove('hidden');
+            document.querySelector('.sentimentChart_gemini').classList.remove('hidden');
             // document.querySelector('.nullScore').classList.remove('hidden');            
 
             // Limpiar cualquier gráfica previa de Plotly
             const chartDiv = document.getElementById('sentimentChart');
             const chartDiv_gemini = document.getElementById('sentimentChart_gemini');
-            if (chartDiv) Plotly.purge(chartDiv);            
-            if (sentimentChart_gemini) Plotly.purge(sentimentChart_gemini);            
+            if (chartDiv) Plotly.purge(chartDiv);
+            if (sentimentChart_gemini) Plotly.purge(sentimentChart_gemini);
 
             const formData = new FormData(e.target);
-            
+
             try {
                 const response = await fetch('', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const data = await response.json();
 
-                document.getElementById('result').classList.remove('hidden');
-                
-                if ((data.filtered_text!='')&(data.result.positive >= 0)) { document.getElementById('positiveScore').textContent = `😁 ${(data.result.positive * 100).toFixed(0)}%`; }
-                else { document.querySelector('.text-green-500').classList.add('hidden'); 
-                    document.getElementById('nullScore').textContent = `Lo siento, tengo limitaciones para interpretar esta reseña, mi modelo es limitado!`;
-                } 
-                if ((data.filtered_text!='')&(data.result.negative >= 0)) { document.getElementById('negativeScore').textContent = `😫 ${(data.result.negative * 100).toFixed(0)}%`; } 
-                else { document.querySelector('.text-red-500').classList.add('hidden'); }
-                
-                if (data.result==false) {document.getElementById('sentimentChart').classList.add('hidden');}
-                // else {document.getElementById('sentimentChart').classList.remove('hidden');}
-                    
-                if ((data.positive_gemini!=0) | (data.negative_gemini!=0)) {document.getElementById('positive_gemini').textContent = `😁 ${data.positive_gemini}%`}
-                else { document.querySelector('.gemini').classList.add('hidden');  document.querySelector('.display_none').style.display = 'none'} 
-                if ((data.positive_gemini!=0) | (data.negative_gemini!=0)) {document.getElementById('negative_gemini').textContent = `😫 ${data.negative_gemini}%`;}
-                else { document.querySelector('.gemini').classList.add('hidden'); document.querySelector('.display_none').style.display = 'none'} 
+                if (data.translated_text){document.getElementById('spinner').classList.add('hidden'); }
 
-                if ((data.positive_gemini==0) & (data.negative_gemini==0)) {document.getElementById('gemini_result').textContent = `${data.gemini_result}`;
+                document.getElementById('result').classList.remove('hidden');
+
+                if ((data.filtered_text != '') & (data.result.positive >= 0)) { document.getElementById('positiveScore').textContent = `😁 ${(data.result.positive * 100).toFixed(0)}%`; }
+                else {
+                    document.querySelector('.text_green').classList.add('hidden');
+                    document.getElementById('nullScore').textContent = `Lo siento, tengo limitaciones para interpretar esta reseña, mi modelo es limitado!`;
+                }
+                if ((data.filtered_text != '') & (data.result.negative >= 0)) { document.getElementById('negativeScore').textContent = `😫 ${(data.result.negative * 100).toFixed(0)}%`; }
+                else { document.querySelector('.text_red').classList.add('hidden'); }
+
+                if (data.result == false) { document.getElementById('sentimentChart').classList.add('hidden'); }
+                // else {document.getElementById('sentimentChart').classList.remove('hidden');}
+
+                if ((data.positive_gemini != 0) | (data.negative_gemini != 0)) { document.getElementById('positive_gemini').textContent = `😁 ${data.positive_gemini}%` }
+                else { document.querySelector('.gemini').classList.add('hidden'); document.querySelector('.display_none').style.display = 'none' }
+                if ((data.positive_gemini != 0) | (data.negative_gemini != 0)) { document.getElementById('negative_gemini').textContent = `😫 ${data.negative_gemini}%`; }
+                else { document.querySelector('.gemini').classList.add('hidden'); document.querySelector('.display_none').style.display = 'none' }
+
+                if ((data.positive_gemini == 0) & (data.negative_gemini == 0)) {
+                    document.getElementById('gemini_result').textContent = `${data.gemini_result}`;
                     document.querySelector('.gemini_result').classList.remove('hidden');
-                    }
-                else { document.querySelector('.gemini_result').classList.add('hidden'); } 
+                }
+                else { document.querySelector('.gemini_result').classList.add('hidden'); }
 
                 // translated_text
                 document.getElementById('translated_text').textContent = ` ${data.translated_text}`;
-                
+
                 // Plotly stacked bar chart setup
                 const chartData = [{
-                x: [data.result.positive * 100],
-                y: ['Sentiment'],
-                name: 'Positive',
-                type: 'bar',
-                orientation: 'h',
-                marker: { color: '#4CAF50' }, // Green for positive
-                text: `${(data.result.positive * 100).toFixed(0)}% `,
-                textposition: 'inside',
-                textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
-            }, {
-                x: [data.result.negative * 100],
-                y: ['Sentiment'],
-                name: 'Negative',
-                type: 'bar',
-                orientation: 'h',
-                marker: { color: '#F44336' }, // Red for negative
-                text: `${(data.result.negative * 100).toFixed(0)}% `,
-                textposition: 'inside',
-                textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
-            }];
-                
+                    x: [data.result.positive * 100],
+                    y: ['Sentiment'],
+                    name: 'Positive',
+                    type: 'bar',
+                    orientation: 'h',
+                    marker: { color: '#eab308' }, // yellow-500 for positive
+                    text: `${(data.result.positive * 100).toFixed(0)}% `,
+                    textposition: 'inside',
+                    textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
+                }, {
+                    x: [data.result.negative * 100],
+                    y: ['Sentiment'],
+                    name: 'Negative',
+                    type: 'bar',
+                    orientation: 'h',
+                    marker: { color: '#60a5fa' }, // blue-400 for negative
+                    text: `${(data.result.negative * 100).toFixed(0)}% `,
+                    textposition: 'inside',
+                    textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
+                }];
+
                 // Layout options to stack bars and hide legends and axes
                 const layout = {
                     margin: {
@@ -181,34 +210,34 @@
                     yaxis: { visible: false, fixedrange: true },
                     height: 100
                 };
-                
+
                 // Render the Plotly chart
-                Plotly.newPlot('sentimentChart', chartData, layout);
+                Plotly.newPlot('sentimentChart', chartData, layout, { staticPlot: true });
 
                 // ####################################################
                 // Plotly stacked bar chart setup with GEMINI:
                 const chartData_gemini = [{
-                x: [data.positive_gemini],
-                y: ['Sentiment'],
-                name: 'Positive',
-                type: 'bar',
-                orientation: 'h',
-                marker: { color: '#4CAF50' }, // Green for positive
-                text: `${(data.positive_gemini).toFixed(0)}% `,
-                textposition: 'inside',
-                textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
-            }, {
-                x: [data.negative_gemini],
-                y: ['Sentiment'],
-                name: 'Negative',
-                type: 'bar',
-                orientation: 'h',
-                marker: { color: '#F44336' }, // Red for negative
-                text: `${(data.negative_gemini).toFixed(0)}% `,
-                textposition: 'inside',
-                textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
-            }];
-                
+                    x: [data.positive_gemini],
+                    y: ['Sentiment'],
+                    name: 'Positive',
+                    type: 'bar',
+                    orientation: 'h',
+                    marker: { color: '#f472b6' }, // pink-400 for negative
+                    text: `${(data.positive_gemini).toFixed(0)}% `,
+                    textposition: 'inside',
+                    textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
+                }, {
+                    x: [data.negative_gemini],
+                    y: ['Sentiment'],
+                    name: 'Negative',
+                    type: 'bar',
+                    orientation: 'h',
+                    marker: { color: '#a855f7' }, // parple-500 for positive
+                    text: `${(data.negative_gemini).toFixed(0)}% `,
+                    textposition: 'inside',
+                    textfont: { size: 25, color: '#ffffff', family: 'Arial', weight: 'bold' } // Set font size and style
+                }];
+
                 // Layout options to stack bars and hide legends and axes
                 const layout_gemini = {
                     margin: {
@@ -221,10 +250,10 @@
                     yaxis: { visible: false, fixedrange: true },
                     height: 100
                 };
-                
+
                 // Render the Plotly chart
-                Plotly.newPlot('sentimentChart_gemini', chartData_gemini, layout_gemini);
-                
+                Plotly.newPlot('sentimentChart_gemini', chartData_gemini, layout_gemini, { staticPlot: true });
+
             } catch (error) {
                 console.error('Error:', error);
             }
@@ -233,4 +262,3 @@
 
 </body>
 </html>
-<!-- <svg fill="#e46f2f" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 52 52" enable-background="new 0 0 52 52" xml:space="preserve" stroke="#e46f2f"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M26,2C12.8,2,2,12.8,2,26.1c0,13.3,10.8,24.1,24,24.1s24-10.8,24-24.1C50,12.8,39.2,2,26,2z M17,15 c1.7,0,3,1.8,3,4c0,2.2-1.3,4-3,4c-1.7,0-3-1.8-3-4C14,16.8,15.3,15,17,15z M14,38.7c0.5-6.1,5-11.2,12.1-11.2 c7,0,11.4,5.1,11.9,11.2H14z M35,23c-1.7,0-3-1.8-3-4c0-2.2,1.3-4,3-4c1.7,0,3,1.8,3,4C38,21.2,36.7,23,35,23z"></path> </g></svg> -->
