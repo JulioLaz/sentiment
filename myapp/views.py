@@ -97,8 +97,8 @@ def analyze_sentiment(request):
         except Exception as e:
             translated_text = 'Lo siento, tengo problemas para traducir este texto'
 
-        analyzer_gemini = gemini.chat(text)
-        # analyzer_gemini= '50% positive, 50% negative'
+        # analyzer_gemini = gemini.chat(text)
+        analyzer_gemini= '50% positive, 50% negative'
 
         print('analyzer_gemini :', analyzer_gemini)
 
